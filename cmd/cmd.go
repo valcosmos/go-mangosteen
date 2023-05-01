@@ -25,13 +25,21 @@ func Run() {
 		Use: "db",
 		Run: func(cmd *cobra.Command, args []string) {
 			database.Connect()
-			database.CreateTables()
 			// RunServer()
+		},
+	}
+
+	createCmd := &cobra.Command{
+		Use: "create",
+		Run: func(cmd *cobra.Command, args []string) {
+			database.CreateTables()
+
 		},
 	}
 
 	rootCmd.AddCommand(srvCmd)
 	rootCmd.AddCommand(dbCmd)
+	dbCmd.AddCommand(createCmd)
 	rootCmd.Execute()
 
 }
