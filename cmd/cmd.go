@@ -37,10 +37,18 @@ func Run() {
 		},
 	}
 
+	mgrtCmd := &cobra.Command{
+		Use: "migrate",
+		Run: func(cmd *cobra.Command, args []string) {
+			database.Migrate()
+		},
+	}
+
 	rootCmd.AddCommand(srvCmd)
 	rootCmd.AddCommand(dbCmd)
 	dbCmd.AddCommand(createCmd)
 	rootCmd.Execute()
+	dbCmd.AddCommand(mgrtCmd)
 
 }
 

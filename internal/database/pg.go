@@ -47,3 +47,32 @@ func CreateTables() {
 	}
 	log.Println("Successfully create users table")
 }
+
+func handleError(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func Migrate() {
+	_, err := DB.Exec(`ALTER TABLE users ADD COLUMN phone VARCHAR(50)`)
+	handleError(err)
+	log.Println("Successfully add phone column to users table")
+
+	_, err = DB.Exec("ALTER TABLE users ADD COLUMN address VARCHAR(200)")
+	handleError(err)
+	log.Println("Successfully add address column to users table")
+
+	// 新增 Items表，字段为 id, amount, happened_at, created_at, updated_at
+	_, err = DB.Exec(`CREATE TABLE IF NOT EXISTS items (
+		id SERIAL PRIMARY KEY,
+		amount INTEGER NOT NULL,
+		happened_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,	
+		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,	
+		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,	
+	)`)
+	// postgreSQL修改字段类型
+	// _, err = DB.Exec("ALTER TABLE items ALTER COLUMN happened_at TYPE TIMESTAMP")
+	handleError(err)
+	log.Println("Successfully create items table")
+}
