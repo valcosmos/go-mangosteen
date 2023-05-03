@@ -10,9 +10,6 @@ import (
 func Run() {
 	rootCmd := &cobra.Command{
 		Use: "mangosteen",
-		// Run: func(cmd *cobra.Command, args []string) {
-		// 	fmt.Print("hi")
-		// },
 	}
 	srvCmd := &cobra.Command{
 		Use: "server",
@@ -23,10 +20,6 @@ func Run() {
 
 	dbCmd := &cobra.Command{
 		Use: "db",
-		Run: func(cmd *cobra.Command, args []string) {
-			database.Connect()
-			// RunServer()
-		},
 	}
 
 	createCmd := &cobra.Command{
@@ -44,12 +37,18 @@ func Run() {
 		},
 	}
 
-	rootCmd.AddCommand(srvCmd)
-	rootCmd.AddCommand(dbCmd)
-	dbCmd.AddCommand(createCmd)
-	rootCmd.Execute()
-	dbCmd.AddCommand(mgrtCmd)
+	crudCmd := &cobra.Command{
+		Use: "curd",
+		Run: func(cmd *cobra.Command, args []string) {
+			database.Crud()
+		},
+	}
 
+	database.Connect()
+	rootCmd.AddCommand(srvCmd, dbCmd)
+	dbCmd.AddCommand(createCmd, mgrtCmd, crudCmd)
+	defer database.Close()
+	rootCmd.Execute()
 }
 
 func RunDatabase() {}

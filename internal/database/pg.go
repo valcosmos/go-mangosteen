@@ -33,6 +33,11 @@ func Connect() {
 	log.Println("Successfully connect to db")
 }
 
+func Close() {
+	DB.Close()
+	log.Println("Successfully close db")
+}
+
 // CreateTables for creating tables
 func CreateTables() {
 	_, err := DB.Exec(`CREATE TABLE IF NOT EXISTS users (
@@ -41,27 +46,26 @@ func CreateTables() {
 		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)`)
-
 	if err != nil {
-		log.Fatal()
+		log.Fatalln(err)
 	}
 	log.Println("Successfully create users table")
 }
 
-func handleError(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func Migrate() {
 	_, err := DB.Exec(`ALTER TABLE users ADD COLUMN phone VARCHAR(50)`)
-	handleError(err)
-	log.Println("Successfully add phone column to users table")
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.Println("Successfully add phone column to users table")
+	}
 
 	_, err = DB.Exec("ALTER TABLE users ADD COLUMN address VARCHAR(200)")
-	handleError(err)
-	log.Println("Successfully add address column to users table")
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.Println("Successfully add address column to users table")
+	}
 
 	// 新增 Items表，字段为 id, amount, happened_at, created_at, updated_at
 	_, err = DB.Exec(`CREATE TABLE IF NOT EXISTS items (
@@ -69,10 +73,47 @@ func Migrate() {
 		amount INTEGER NOT NULL,
 		happened_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,	
 		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,	
-		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,	
+		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 	)`)
 	// postgreSQL修改字段类型
 	// _, err = DB.Exec("ALTER TABLE items ALTER COLUMN happened_at TYPE TIMESTAMP")
-	handleError(err)
-	log.Println("Successfully create items table")
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.Println("Successfully create items table")
+	}
+}
+
+func Crud() {
+	// 创建一个User
+	result, err := DB.Query(`INSERT INTO users (email) values ('admin1@admin.com')`)
+	if err != nil {
+		log.Println(err)
+	} else {
+		if result.Next() {
+			var email string
+			result.Scan(&email)
+			log.Println(email)
+		}
+		log.Println("Successfully create a user")
+	}
+
+	_, err = DB.Exec(`UPDATE users SET phone = 18088886666 where email = 'admin1@admin.com'`)
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.Println("Successfully update a user")
+	}
+
+	result, err = DB.Query(`SELECT phone FROM users where email = 'admin1@admin.com'`)
+	if err != nil {
+		log.Println(err)
+	} else {
+		for result.Next() {
+			var phone string
+			result.Scan(&phone)
+			log.Println(phone)
+		}
+		log.Println("Successfully read users")
+	}
 }
