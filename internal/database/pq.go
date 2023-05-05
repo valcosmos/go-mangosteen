@@ -4,6 +4,7 @@ import (
 	// "database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
@@ -36,9 +37,21 @@ func Close() {
 	sqlDB.Close()
 }
 
+type User struct {
+	ID        int
+	Email     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 // CreateTables for creating tables
 func CreateTables() {
-
+	u1 := User{Email: "Cupid@admin.com"}
+	err := DB.Migrator().CreateTable(&u1)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Println("Successfully create table")
 }
 
 func Migrate() {
