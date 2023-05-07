@@ -22,11 +22,18 @@ func Run() {
 		Use: "db",
 	}
 
-	createCmd := &cobra.Command{
-		Use: "create",
-		Run: func(cmd *cobra.Command, args []string) {
-			database.CreateTables()
+	// createCmd := &cobra.Command{
+	// 	Use: "create",
+	// 	Run: func(cmd *cobra.Command, args []string) {
+	// 		database.CreateTables()
 
+	// 	},
+	// }
+
+	createMigrationCmd := &cobra.Command{
+		Use: "create:migration",
+		Run: func(cmd *cobra.Command, args []string) {
+			database.CreateMigration(args[0])
 		},
 	}
 
@@ -46,7 +53,7 @@ func Run() {
 
 	database.Connect()
 	rootCmd.AddCommand(srvCmd, dbCmd)
-	dbCmd.AddCommand(createCmd, mgrtCmd, crudCmd)
+	dbCmd.AddCommand(mgrtCmd, crudCmd, createMigrationCmd)
 	defer database.Close()
 	rootCmd.Execute()
 }
