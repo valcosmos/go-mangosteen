@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"mangosteen/config/queries"
+	"math/rand"
 	"os"
 	"os/exec"
 
@@ -91,9 +92,36 @@ func MigrateDown() {
 
 func Crud() {
 	q := queries.New(DB)
-	u, err := q.CreateAUser(DBCtx, "admin@admin.com")
+	id := rand.Int()
+	u, err := q.CreateAUser(DBCtx, fmt.Sprintf("%d@admin.com", id))
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println(u)
+	err = q.UpdateUser(DBCtx, queries.UpdateUserParams{
+		ID:      u.ID,
+		Email:   u.Email,
+		Phone:   u.Phone,
+		Address: "Shanghai China",
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	users, err := q.ListUsers(DBCtx, queries.ListUsersParams{
+		Offset: 0,
+		Limit:  10,
+	})
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	u, err = q.FindUser(DBCtx, users[0].ID)
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = q.DeleteUser(DBCtx, users[0].ID)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
