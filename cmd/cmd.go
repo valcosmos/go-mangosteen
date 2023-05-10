@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"mangosteen/internal/database"
+	"mangosteen/internal/email"
 	"mangosteen/internal/router"
 
 	"github.com/spf13/cobra"
@@ -58,8 +59,15 @@ func Run() {
 		},
 	}
 
+	emailCmd := &cobra.Command{
+		Use: "email",
+		Run: func(cmd *cobra.Command, args []string) {
+			email.Send()
+		},
+	}
+
 	database.Connect()
-	rootCmd.AddCommand(srvCmd, dbCmd)
+	rootCmd.AddCommand(srvCmd, dbCmd, emailCmd)
 	dbCmd.AddCommand(mgrtCmd, crudCmd, createMigrationCmd, mgrtDownCmd)
 	defer database.Close()
 	rootCmd.Execute()
