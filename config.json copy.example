@@ -1,0 +1,10 @@
+{
+  "email": {
+    "smtp": {
+      "host": "smtp.gmail.com",
+      "port": 465,
+      "user": "admin@admin.com",
+      "password": "xxx"
+    }
+  }
+}
